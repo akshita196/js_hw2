@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Akshita">
+  <title>Dynamic GIF</title>
+  <script src="https://netnet.studio/nn.min.js"></script>
+  <script>
+    let textColor, bgColor
+
+    function setup () {
+      textColor = nn.randomColor()
+      bgColor = nn.randomColor()
+      while (nn.colorContrast(textColor, bgColor) < 3) {
+        textColor = nn.randomColor()
+      }
+      nn.get('body')
+        .content('Hi World Wide Web!')
+        .css({
+          color: textColor,
+          background: bgColor,
+          overflow: 'hidden',
+          height: '100vh',
+          display: 'grid',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 72
+        })
+      nn.times(25, createGif)
+    }
+
+    function createGif () {
+      const x = nn.random(-100, nn.width + 100)
+      const y = nn.random(-100, nn.height + 100)
+      const r = nn.random(360)
+      const c = nn.toHSL(textColor)
+      nn.create('img')
+        .set('src', 'source.gif')
+        .addTo('body')
+        .position(x, y)
+        .rotate(r)
+        .hueRotate(60 - c.h)
+        .saturate(c.s / 100)
+        .brightness(c.l / 100)
+        .css({
+          cursor: 'grab',
+          userSelect: 'none',
+          transition: 'all 1.5s ease-out'
+        })
+        .on('mouseover', async function () {
+          this.scale(3)
+          this.css('opacity', 0)
+          this.rotate(r - 180)
+          await nn.sleep(1500)
+          this.remove()
+        })
+    }
+
+    function update () {
+           nn.getAll('img').forEach(img => img.remove())
+      setup()
+    }
+
+    nn.on('load', setup)
+    nn.on('click', update)
+  </script>
+</head>
+<body>
+</body>
+</html>
